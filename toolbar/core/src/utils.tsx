@@ -5,6 +5,8 @@ import type {
 
 export const companionAnchorTagName = 'stagewise-companion-anchor';
 
+//zhm: Stagewise 工具栏通过直接访问 iframe 的 contentWindow来与用户应用通信，而不是使用 postMessage。这是一种同源策略下的直接 DOM 访问方式。
+// 工具栏通过 getIFrameWindow() 函数直接访问用户应用的 iframe
 const getIFrame = () => {
   const iframe = document.getElementById('user-app-iframe');
   return iframe as HTMLIFrameElement | null;
@@ -14,6 +16,7 @@ export const getIFrameWindow = () => {
   return getIFrame()?.contentWindow;
 };
 
+// zhm: 使用 iframe 的 document.elementsFromPoint() API 来获取指定坐标下的所有 DOM 元素，并过滤掉 SVG 元素和工具栏自身的元素。
 export function getElementAtPoint(x: number, y: number) {
   // Validate that x and y are finite numbers to prevent crashes
   if (!Number.isFinite(x) || !Number.isFinite(y)) {

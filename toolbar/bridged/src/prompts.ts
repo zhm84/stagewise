@@ -239,6 +239,7 @@ export interface PluginContextSnippets {
  * @param contextSnippets - An array of context snippets from a list of plugins.
  * @returns A formatted string prompt for the LLM.
  */
+//zhm: 发送给VSCode扩展的完整信息包括：DOM信息、当前页面url、框架特定上下文
 export function createPrompt(
   selectedElements: HTMLElement[],
   userPrompt: string,

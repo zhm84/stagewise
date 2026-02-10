@@ -8,6 +8,7 @@
     "allowJs": true,
 
     // Bundler mode
+    // zhm: TypeScript 配置使用 bundler 模式解析，不生成输出文件，实际构建由 esbuild 处理
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,

@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "dotenv -e ../../.env -- tsx build.ts",
-    "dev": "NODE_ENV=development dotenv -e ../../.env -- tsx src/index.ts",
+    "dev": "cross-env NODE_ENV=development dotenv -e ../../.env -- tsx src/index.ts",
     "run": "dotenv -e ../../.env -- rsx dist/index.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -62,6 +62,7 @@
     "typescript": "^5",
     "vitest": "^2.0.0",
     "winston": "^3.17.0",
-    "zod": "^3.24.0"
+    "zod": "^3.24.0",
+    "cross-env": "^7.0.3"
   }
 }

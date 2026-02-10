@@ -9,6 +9,8 @@ import { MainAppBlocker } from './components/main-app-blocker.js';
 import { UrlSynchronizer } from './components/url-synchronizer.js';
 import { MetaSynchronizer } from './components/meta-synchronizer';
 
+//zhm: 工具栏 App 组件会创建一个 iframe 来加载用户的实际应用,
+// 这个 iframe 的 src 指向用户应用的 URL，实际内容由代理中间件从 appPort 获取。
 export function App(config?: InternalToolbarConfig) {
   // Get the initial URL from the parent window
   // Ensure we have a valid path (default to '/' if empty)

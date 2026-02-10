@@ -247,6 +247,7 @@ async function main() {
     // Start the server listening
     server.listen(config.port);
 
+    // zhm: Server 监听配置的端口，自动在浏览器中打开
     server.on('listening', async () => {
       const address = server.address();
       const port =

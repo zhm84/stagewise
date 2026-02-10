@@ -16,6 +16,9 @@ interface NavigationState {
   timestamp: number;
 }
 
+//zhm: 工具栏实现了双向 URL 同步，确保父窗口和 iframe 之间的 URL 保持一致
+// 工具栏会监听 iframe 内的多种导航事件： url-synchronizer.tsx:271-308
+// 这确保了当用户在应用内导航时，父窗口的 URL 也会相应更新，维持浏览器地址栏与应用状态的同步。
 export function UrlSynchronizer({
   appPort,
   urlSyncConfig,

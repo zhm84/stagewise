@@ -85,6 +85,7 @@ export class AgentService {
       images: [],
     };
 
+    //zhm: 在VSCode扩展中向AI Agent发送消息
     await dispatchAgentCall(request);
   }
 }

@@ -13,6 +13,7 @@ export async function callClineAgent(request: {
 
   const promptWithPrefix = `${CLINE_PROMPT_PREFIX}\n${prompt}`;
 
+  //zhm: 通过VSCode的诊断系统进行通信
   await callClineWithDiagnostic(promptWithPrefix);
 }
 

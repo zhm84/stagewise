@@ -400,6 +400,7 @@ const truncatePluginInfo = (
   }));
 };
 
+// zhm: 从 HTML 元素中提取完整的元数据
 export const getSelectedElementInfo = (
   element: HTMLElement,
   callDepth?: number,

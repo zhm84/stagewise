@@ -12,6 +12,7 @@ styleNode.textContent = appStyle;
 document.head.appendChild(styleNode);
 
 // Initialize the app
+// zhm: 初始化工具栏
 createRoot(document.body).render(
   createElement(StrictMode, null, createElement(App, config)),
 );

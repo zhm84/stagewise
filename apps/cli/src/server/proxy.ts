@@ -14,6 +14,8 @@ export const proxy = createProxyMiddleware({
     const isToolbarPath = pathname.startsWith('/stagewise-toolbar-app');
     const isDocument = req.headers['sec-fetch-dest'] === 'document';
 
+    // zhm: stagewise-toolbar-app 开头，则不代理，由本地 Express 处理
+    // 请求的 sec-fetch-dest 头为 document，则不代理（需要注入工具栏）
     if (isToolbarPath || isDocument) {
       log.debug(
         `Not proxying ${pathname} - toolbar: ${isToolbarPath}, document: ${isDocument}`,

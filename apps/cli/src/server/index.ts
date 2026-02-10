@@ -145,6 +145,7 @@ export default config;
     }
   };
 
+//zhm: 创建工具栏
 const createToolbarHtmlHandler =
   (plugins: Plugin[]) => async (_req: Request, res: Response) => {
     try {
@@ -286,6 +287,7 @@ export const getServer = async () => {
     }
 
     // Add wildcard route LAST, after all other routes including agent routes
+    // zhm: 代理中间件proxy放过了请求的 sec-fetch-dest 头为 document，或路径以 /stagewise-toolbar-app 开头的，到达这一步
     app.get(
       /^(?!\/stagewise-toolbar-app).*$/,
       createToolbarHtmlHandler(plugins),

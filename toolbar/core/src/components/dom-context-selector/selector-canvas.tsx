@@ -12,6 +12,7 @@ import { useContextChipHover } from '@/hooks/use-context-chip-hover';
 import { SelectedItem } from './selected-item';
 import { cn, getElementAtPoint, getXPathForElement } from '@/utils';
 
+// zhm: 全屏覆盖层，监听鼠标移动和点击事件
 export function DOMContextSelector() {
   const {
     domContextElements,

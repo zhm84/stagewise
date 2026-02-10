@@ -184,6 +184,8 @@ export const ChatStateProvider = ({ children }: ChatStateProviderProps) => {
     }
   }, [isWorking, isPromptCreationMode, stopPromptCreation]);
 
+  // zhm: 将选中的元素存储到工具栏状态
+  // 存储元素引用，并调用所有已注册插件的 onContextElementSelect 钩子来提取插件特定的上下文信息
   const addChatDomContext = useCallback(
     (element: HTMLElement) => {
       const pluginsWithContextGetters = plugins.filter(

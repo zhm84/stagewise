@@ -1,6 +1,7 @@
 packages:
 - apps/*
 - packages/*
+- vscode-extension-standalone
 - playgrounds/*
 - examples/*
 - toolbar/*

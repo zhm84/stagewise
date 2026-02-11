@@ -24,7 +24,6 @@ src/
 │   ├── posthog.ts          # PostHog client integration
 │   └── events.ts           # Analytics event definitions
 ├── server/                  # HTTP/WebSocket server implementation
-│   ├── agent-loader.ts     # Agent initialization and management
 │   ├── error-page.ts       # Error page generation
 │   ├── index.ts            # Express server setup
 │   ├── plugin-loader.ts    # Plugin discovery and loading
@@ -74,7 +73,6 @@ src/
 ├── server/
 │   ├── __tests__/
 │   │   └── error-page.test.ts
-│   ├── agent-loader.ts
 │   ├── error-page.ts
 │   ├── index.ts
 │   ├── plugin-loader.ts
@@ -136,10 +134,10 @@ src/
 
 ### 5. Server (`server/`)
 - **Express Server**: Main HTTP server with middleware pipeline
-- **Agent Loader**: Initializes Stagewise agent with WebSocket support (disabled in bridge mode)
+- **Bridge Mode Only**: CLI runs in bridge mode; no built-in stagewise agent server. A minimal Karton WebSocket server is created for toolbar communication when `-b` is used.
 - **HTTP Proxy**: Proxies non-toolbar requests to user's application with header preservation
 - **Plugin Loader**: Discovers and loads framework-specific UI plugins with dependency compatibility checking
-- **WebSocket Support**: Handles WebSocket connections for agent communication and proxy upgrades
+- **WebSocket Support**: Handles WebSocket upgrades for the bridge-mode Karton server and proxy upgrades
 - **Error Handling**: Custom error pages when proxied application is unavailable
 
 ### 6. Dependency Parser (`dependency-parser/`)
@@ -221,7 +219,7 @@ Executes external commands while running Stagewise server concurrently in the ba
 - Handles cross-platform signal forwarding (SIGINT, SIGTERM)
 - Runs Stagewise server concurrently in background
 - Minimal configuration required (silent mode enabled by default)
-- Works with both standard and bridge modes
+- Bridge mode (`-b`) is the supported mode for toolbar and proxy; built-in agent has been removed
 
 ### Auth Command
 ```
@@ -255,19 +253,16 @@ The CLI supports three distinct execution modes:
 
 ### 1. Standard Mode
 Default mode when no special flags or commands are provided.
-- Starts full Stagewise server with agent capabilities
+- Starts Stagewise server with proxy and toolbar (no built-in stagewise agent)
 - Requires app-port configuration for proxying
-- Requires authentication for agent features
 - Interactive setup if configuration is missing
 - Opens browser automatically to the Stagewise interface
 
 ### 2. Bridge Mode (`-b` flag)
-Lightweight mode that disables the agent server.
-- Starts proxy server only (no agent capabilities)
-- No authentication required
-- Still requires app-port for proxying user's application
-- Suitable for environments where agent features aren't needed
-- Reduces resource usage and startup time
+- Enables the minimal Karton WebSocket server for toolbar communication
+- No authentication required for toolbar/proxy
+- Requires app-port for proxying user's application
+- Allows connecting to external agents (e.g. from IDE extensions)
 
 ### 3. Command Wrapping Mode (`-- command`)
 Executes external commands while running Stagewise server concurrently.
@@ -284,7 +279,6 @@ Executes external commands while running Stagewise server concurrently.
 ### Graceful Shutdown
 - Handles SIGINT and SIGTERM signals
 - Closes WebSocket connections
-- Shuts down agent properly
 - Forces exit after 5-second timeout
 
 ### Plugin System

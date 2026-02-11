@@ -3,7 +3,6 @@ import { configFileExists } from './config/config-file';
 import { telemetryManager, analyticsEvents } from './utils/telemetry';
 import { identifierManager } from './utils/identifier';
 import { getServer } from './server';
-import { shutdownAgent } from './server/agent-loader';
 import { log } from './utils/logger';
 import {
   silent,
@@ -22,7 +21,6 @@ import {
 } from './dependency-parser/index.js';
 import open from 'open';
 import { commandExecutor } from './utils/command-executor';
-import { startupBanner } from './utils/startup-banner.js';
 
 // Suppress util._extend deprecation warnings
 // Set NODE_NO_DEPRECATION to suppress all deprecation warnings, then restore other warnings
@@ -225,25 +223,8 @@ async function main() {
       );
     }
 
-    const { server, plugins } = await getServer();
+    const { server } = await getServer();
 
-    if (!config.bridgeMode && authState?.isAuthenticated) {
-      try {
-        const subscription = await oauthManager.getSubscription();
-
-        startupBanner({
-          subscription,
-          loadedPlugins: plugins,
-          email: authState?.userEmail || '',
-          appPort: config.port,
-          proxyPort: config.appPort,
-        });
-      } catch (error) {
-        log.error(
-          `Failed to display startup banner: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
-      }
-    }
     // Start the server listening
     server.listen(config.port);
 
@@ -288,8 +269,6 @@ async function main() {
         // Ignore analytics errors during shutdown
       }
 
-      // Shutdown agent first
-      shutdownAgent();
       // Force close all connections
       server.closeAllConnections();
 

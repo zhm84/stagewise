@@ -1,17 +1,9 @@
-import type { RouterOutputs } from '@stagewise/api-client';
 import table from 'cli-table3';
 import { log } from './logger.js';
 import chalk from 'chalk';
-import type { Plugin } from '../server/plugin-loader.js';
-
-type Subscription = RouterOutputs['subscription']['getSubscription'];
 
 type StartupBannerProps = {
-  subscription: Subscription | null;
-  loadedPlugins: Plugin[];
   email: string;
-  appPort: number;
-  proxyPort: number;
 };
 
 export function startupBanner({ email }: StartupBannerProps) {

@@ -5,11 +5,10 @@ import { createServer } from 'node:http';
 import { configResolver } from '../config/index.js';
 import { proxy } from './proxy.js';
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { oauthManager } from '../auth/oauth.js';
 import { log } from '../utils/logger.js';
-import { loadAndInitializeAgent, getAgentInstance } from './agent-loader.js';
 import {
   loadPlugins,
   generatePluginImportMapEntries,
@@ -46,7 +45,26 @@ const getImportMap = async (plugins: Plugin[]) => {
           'node_modules/@stagewise/toolbar/dist/toolbar-main/.vite/manifest.json',
         );
 
-  const mainAppManifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
+  let resolvedManifestPath = manifestPath;
+  if (!existsSync(manifestPath) && config.bridgeMode && process.env.NODE_ENV !== 'production') {
+    const altManifestPath = resolve(
+      process.cwd(),
+      'node_modules/@stagewise/toolbar-bridged/dist/toolbar-main/manifest.json',
+    );
+    if (existsSync(altManifestPath)) {
+      resolvedManifestPath = altManifestPath;
+    }
+  }
+  if (!existsSync(resolvedManifestPath)) {
+    if (config.bridgeMode && process.env.NODE_ENV !== 'production') {
+      throw new Error(
+        'Bridge mode requires @stagewise/toolbar-bridged to be built. Run from repo root: pnpm build --filter @stagewise/toolbar-bridged',
+      );
+    }
+    throw new Error(`Manifest not found: ${resolvedManifestPath}`);
+  }
+
+  const mainAppManifest = JSON.parse(await readFile(resolvedManifestPath, 'utf-8'));
   const mainAppEntries: Record<string, string> = {};
   for (const [_, entry] of Object.entries(mainAppManifest) as [
     string,
@@ -229,44 +247,8 @@ export const getServer = async () => {
     // Create HTTP server from Express app
     const server = createServer(app);
 
-    // Initialize agent server if not in bridge mode (BEFORE wildcard route)
     let bridgeModeWss: WebSocketServer | null = null;
     let bridgeModeWsPath: string | null = null;
-    let agentWss: WebSocketServer | null = null;
-    let agentWsPath: string | null = null;
-
-    if (!config.bridgeMode) {
-      try {
-        // Get access token for agent
-        const token = await oauthManager.getToken();
-        if (token) {
-          // Load and initialize agent using the loader module
-          // This will register agent routes at /stagewise-toolbar-app/server/*
-          const agentResult = await loadAndInitializeAgent(
-            token.accessToken,
-            token.refreshToken,
-          );
-          if (agentResult.success && agentResult.wss) {
-            agentWss = agentResult.wss;
-            log.debug('Received websocket server from agent loader');
-            agentWsPath = '/stagewise-toolbar-app/karton';
-            log.debug(
-              `Agent WebSocket server configured for path: ${agentWsPath}`,
-            );
-          }
-        } else {
-          log.debug(
-            'Agent server not initialized - no authentication token available',
-          );
-          log.debug('Run "stagewise auth login" to enable agent functionality');
-        }
-      } catch (error) {
-        log.error(
-          `Failed to initialize agent server: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
-        // Continue without agent server - it's not critical for basic functionality
-      }
-    }
 
     if (config.bridgeMode) {
       const kartonServer = await createKartonServer<KartonContract>({
@@ -304,14 +286,7 @@ export const getServer = async () => {
         log.debug(`Proxying WebSocket request to app port ${config.appPort}`);
         proxy.upgrade?.(request, socket as any, head);
       } else {
-        if (agentWss && pathname === agentWsPath) {
-          // Handle agent WebSocket requests
-          log.debug('Handling agent WebSocket upgrade');
-          agentWss.handleUpgrade(request, socket, head, (ws: WebSocket) => {
-            agentWss.emit('connection', ws, request);
-          });
-        } else if (bridgeModeWss && pathname === bridgeModeWsPath) {
-          // Handle bridge mode WebSocket requests
+        if (bridgeModeWss && pathname === bridgeModeWsPath) {
           log.debug('Handling bridge mode WebSocket upgrade');
           bridgeModeWss.handleUpgrade(
             request,
@@ -328,7 +303,7 @@ export const getServer = async () => {
       }
     });
 
-    return { app, server, agent: getAgentInstance(), agentWss, plugins };
+    return { app, server, plugins };
   } catch (error) {
     console.error(error);
     process.exit(1);

@@ -8,7 +8,7 @@ export function generateDeclarationFile(
 ): void {
   const resolvedFiles = Object.fromEntries(
     Object.entries(files).map(([input, output]) => [
-      path.resolve(input),
+      path.normalize(path.resolve(input)),
       output,
     ]),
   );
@@ -53,7 +53,7 @@ export function generateDeclarationFile(
     (fileName, data, writeByteOrderMark, _onError, sourceFiles) => {
       const sourceFile = sourceFiles?.[0];
       if (sourceFile) {
-        const sourceFileName = sourceFile.fileName;
+        const sourceFileName = path.normalize(sourceFile.fileName);
         const mappedOutputName = resolvedFiles[sourceFileName];
 
         if (mappedOutputName) {

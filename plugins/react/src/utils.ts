@@ -61,6 +61,10 @@ export function getReactComponentHierarchyFromSelectedElement(
  * @param element The HTMLElement to inspect.
  * @returns An array of ComponentInfo objects, or null if no components are found or the element is not React-managed.
  */
+// zhm: 遍历组件树，收集信息：
+// 查找Fiber节点：通过DOM元素上的 __reactFiber$ 或 __reactInternalInstance$ 属性访问Fiber节点
+// 遍历组件树：向上遍历最多3层组件，收集Function组件和Class组件
+// 识别组件类型：区分普通客户端组件和React Server Components (RSC)
 export function getReactComponentHierarchy(
   ownProperties: Record<string, any>,
 ): ComponentInfo[] | null {

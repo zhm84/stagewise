@@ -45,6 +45,7 @@ export interface ContextElementContext {
   annotation: string | null;
 }
 
+// zhm: 完整的生命周期钩子
 export interface ToolbarPlugin {
   /** The name of the plugin shown to the user. */
   displayName: string;

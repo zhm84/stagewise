@@ -30,6 +30,7 @@ const BUNDLED_PLUGINS = [
   '@stagewise-plugins/vue',
 ];
 
+// zhm: 插件通过CLI的自动加载机制被发现和加载。当检测到项目中存在 react 和 react-dom 依赖时，会自动加载 @stagewise-plugins/react 插件。
 // Dummy lookup table for matching dependencies to plugins
 const DEPENDENCY_MATCHERS: DependencyMatcher[] = [
   {

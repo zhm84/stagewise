@@ -6,6 +6,7 @@ import {
   getSelectedElementsPrompt,
 } from './utils';
 
+// zhm: React插件通过访问React的内部Fiber架构来收集组件信息
 const ReactPlugin: ToolbarPlugin = {
   displayName: 'React',
   description:
